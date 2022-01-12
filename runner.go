@@ -1,20 +1,26 @@
 package main
 
 import (
-	"fmt"
+	"strconv"
 
 	"github.com/viveknair00/scaling-telegram/download"
+	"github.com/viveknair00/scaling-telegram/vk_consumer"
 )
 
 func main() {
+
+	// exampleDownload()
+	vk_consumer.GetSnapshotPageData()
+}
+
+func exampleDownload() {
 	c := make(chan bool)
 
 	//this is where the magic happens
 	for i := 1; i < 25; i++ {
-		go download.GetUrl("https://jsonplaceholder.typicode.com/posts/", i, c)
+		page := "https://jsonplaceholder.typicode.com/posts/" + strconv.Itoa(i)
+		filePath := "/tmp/test_" + strconv.Itoa(i) + ".txt"
+		go download.GetUrl(page, filePath, c)
 		<-c
 	}
-
-	fmt.Println(download.Add(6, 4))
-	fmt.Println(download.Subtract(5, 4))
 }

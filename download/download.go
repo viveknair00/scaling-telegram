@@ -5,42 +5,29 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strconv"
+
+	"github.com/viveknair00/scaling-telegram/utils"
 )
 
-func Subtract(x, y int) (res int) {
-	return x - y
+func GetUrl(url string, filePath string, c chan bool) {
+	FileWriter(filePath, ReadUrl(url))
+	c <- true
 }
 
-func Add(x, y int) (res int) {
-	return x + y
+func ReadUrl(url string) (reader []byte) {
+	resp, err := http.Get(url)
+	log.Println(url)
+	utils.Check(err)
+	reader1, err := io.ReadAll(resp.Body)
+	utils.Check(err)
+	return reader1
 }
 
-func check(err error) {
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-func GetUrl(url string, part int, c chan bool) {
-	page := url + strconv.Itoa(part)
-	resp, err := http.Get(page)
-
-	log.Println(page)
-	check(err)
-
-	reader, err := io.ReadAll(resp.Body)
-
-	check(err)
-
-	log.Print(part)
-
-	filePath := "/tmp/test_" + strconv.Itoa(part) + ".txt"
+func FileWriter(filePath string, reader []byte) {
 	bodyString := string(reader)
 	f, err := os.Create(filePath)
-	check(err)
+	utils.Check(err)
 	f.WriteString(bodyString)
 
 	log.Print("Completed writing to", filePath)
-	c <- true
 }
