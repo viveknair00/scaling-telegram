@@ -14,6 +14,6 @@ func Add(x, y int) (res int) {
 
 func Check(err error) {
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 }

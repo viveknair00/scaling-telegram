@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/buger/jsonparser"
 	"github.com/viveknair00/scaling-telegram/download"
@@ -90,13 +91,17 @@ func RetrieveData(params parameters, dataType string, c chan bool) {
 
 	for pageStart := int64(0); int64(pageStart) < count; pageStart += pageSize {
 		fmt.Printf("value of a: %d\n", pageStart)
-		filePath := "/tmp/vk_" + "posts_" + params.pageId + "_" + strconv.Itoa(int(pageStart)) + ".json"
+		filePath := "/tmp/posts/vk_" + "posts_" + params.pageId + "_" + strconv.Itoa(int(pageStart)) + ".json"
 		go download.GetUrl(buildUrl(params, dataType, int(pageSize), int(pageStart)), filePath, c)
+		time.Sleep(1 * time.Second)
 	}
-	c <- true
 }
 
 func GetSnapshotPageData() {
+
+	videoAccessToken := "PUT_YOUR_TOKEN_HERE"
+
+	fmt.Println("start")
 
 	for idx, page := range pages {
 		fmt.Println(idx, page)
@@ -114,16 +119,17 @@ func GetSnapshotPageData() {
 			subscribersMethodName: "groups.getMembers?",
 		}
 
-		c := make(chan bool)
-
 		// go getStats(param, c)
 		// go getPosts(param, c)
 		// go getVideos(param, c)
 		// go getSubscribers(param, c)
-
+		c := make(chan bool)
 		go RetrieveData(param, "post", c)
 		<-c
+
 	}
+
+	fmt.Println("Finish")
 
 }
 
